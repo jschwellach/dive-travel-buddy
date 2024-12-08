@@ -28,23 +28,34 @@ export const OpenAIErrorTypes = {
   SERVER_ERROR: "server_error",
   NETWORK_ERROR: "network_error",
   CONFIG_ERROR: "configuration_error",
-};
+} as const;
+
+export type OpenAIErrorType =
+  (typeof OpenAIErrorTypes)[keyof typeof OpenAIErrorTypes];
+
+export interface OpenAIError extends Error {
+  type: OpenAIErrorType;
+}
+
+export type ChunkCallback = (chunk: string) => void;
+export type ErrorCallback = (error: OpenAIError) => void;
+export type CompleteCallback = () => void;
 
 /**
  * Creates a streaming chat completion request
- * @param {string} prompt - The user's prompt
- * @param {function} onChunk - Callback for handling each chunk of the stream
- * @param {function} onError - Callback for handling errors
- * @param {function} onComplete - Callback for handling completion
  */
 export async function createStreamingCompletion(
-  prompt,
-  onChunk,
-  onError,
-  onComplete
-) {
+  prompt: string,
+  onChunk: ChunkCallback,
+  onError: ErrorCallback,
+  onComplete: CompleteCallback
+): Promise<void> {
   if (!prompt) {
-    onError(new Error("Prompt is required"));
+    onError({
+      type: OpenAIErrorTypes.INVALID_REQUEST,
+      message: "Prompt is required",
+      name: "Error",
+    });
     return;
   }
 
@@ -53,11 +64,12 @@ export async function createStreamingCompletion(
       type: OpenAIErrorTypes.CONFIG_ERROR,
       message:
         "OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your .env file.",
+      name: "Error",
     });
     return;
   }
 
-  let reader;
+  let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
   try {
     const response = await fetch(`${API_CONFIG.baseURL}/chat/completions`, {
       method: "POST",
@@ -73,7 +85,7 @@ export async function createStreamingCompletion(
       throw await handleApiError(response);
     }
 
-    reader = response.body.getReader();
+    reader = response.body!.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
     let isDone = false;
@@ -138,7 +150,7 @@ export async function createStreamingCompletion(
     // Always call onComplete when we're done
     onComplete();
   } catch (error) {
-    onError(error);
+    onError(error as OpenAIError);
   } finally {
     // Ensure the reader is properly closed if it exists
     if (reader) {
@@ -155,11 +167,9 @@ export async function createStreamingCompletion(
 
 /**
  * Handles API errors and returns appropriate error objects
- * @param {Response} response - The API response
- * @returns {Error} Formatted error object
  */
-async function handleApiError(response) {
-  const error = new Error();
+async function handleApiError(response: Response): Promise<OpenAIError> {
+  const error = new Error() as OpenAIError;
 
   try {
     const data = await response.json();

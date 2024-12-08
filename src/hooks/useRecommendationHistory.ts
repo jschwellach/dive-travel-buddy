@@ -1,6 +1,30 @@
 import { useState, useEffect, useCallback } from "react";
 
-const generateUserId = () => {
+interface DivePreferences {
+  experienceLevel: string;
+  interests: string[];
+  season: string;
+}
+
+interface HistoryItem {
+  id: number;
+  preferences: DivePreferences;
+  recommendation: string;
+  timestamp: string;
+  userId: string;
+}
+
+interface UseRecommendationHistoryReturn {
+  history: HistoryItem[];
+  addToHistory: (
+    preferences: DivePreferences,
+    recommendation: string
+  ) => HistoryItem;
+  clearHistory: () => void;
+  userId: string;
+}
+
+const generateUserId = (): string => {
   const existingId = localStorage.getItem("diveUserID");
   if (existingId) return existingId;
 
@@ -9,8 +33,8 @@ const generateUserId = () => {
   return newId;
 };
 
-export const useRecommendationHistory = () => {
-  const [history, setHistory] = useState([]);
+export const useRecommendationHistory = (): UseRecommendationHistoryReturn => {
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const userId = generateUserId();
 
   useEffect(() => {
@@ -22,8 +46,8 @@ export const useRecommendationHistory = () => {
   }, [userId]);
 
   const addToHistory = useCallback(
-    (preferences, recommendation) => {
-      const newHistoryItem = {
+    (preferences: DivePreferences, recommendation: string): HistoryItem => {
+      const newHistoryItem: HistoryItem = {
         id: Date.now(),
         preferences,
         recommendation,
@@ -45,7 +69,7 @@ export const useRecommendationHistory = () => {
     [userId]
   );
 
-  const clearHistory = useCallback(() => {
+  const clearHistory = useCallback((): void => {
     setHistory([]);
     localStorage.removeItem(`recommendations_${userId}`);
   }, [userId]);

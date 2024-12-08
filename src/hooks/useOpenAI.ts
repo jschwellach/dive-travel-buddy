@@ -1,14 +1,31 @@
 import { useState, useCallback } from "react";
-import { createStreamingCompletion, OpenAIErrorTypes } from "../config/openai";
+import {
+  createStreamingCompletion,
+  OpenAIErrorTypes,
+  OpenAIError,
+} from "../config/openai";
+
+interface DivePreferences {
+  experienceLevel: string;
+  interests: string[];
+  season: string;
+}
+
+interface UseOpenAIReturn {
+  isLoading: boolean;
+  error: string | null;
+  streamedResponse: string;
+  getRecommendations: (preferences: DivePreferences) => Promise<string | null>;
+  reset: () => void;
+}
 
 /**
  * Custom hook for managing OpenAI API interactions
- * @returns {Object} Hook methods and state
  */
-export function useOpenAI() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [streamedResponse, setStreamedResponse] = useState("");
+export function useOpenAI(): UseOpenAIReturn {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [streamedResponse, setStreamedResponse] = useState<string>("");
 
   /**
    * Reset the hook state
@@ -21,11 +38,9 @@ export function useOpenAI() {
 
   /**
    * Get travel recommendations based on user preferences
-   * @param {Object} preferences User's diving preferences
-   * @returns {Promise<void>}
    */
   const getRecommendations = useCallback(
-    async (preferences) => {
+    async (preferences: DivePreferences): Promise<string | null> => {
       reset();
       setIsLoading(true);
 
@@ -51,7 +66,7 @@ export function useOpenAI() {
             fullResponse += chunk;
             setStreamedResponse(fullResponse);
           },
-          (error) => {
+          (error: OpenAIError) => {
             let errorMessage =
               "An error occurred while getting recommendations.";
 

@@ -3,8 +3,18 @@ import { useOpenAI } from "./hooks/useOpenAI";
 import { useRecommendationHistory } from "./hooks/useRecommendationHistory";
 import "./App.css";
 
+interface DivePreferences {
+  experienceLevel: string;
+  interests: string[];
+  season: string;
+}
+
+interface ExperienceLevels {
+  [key: string]: string;
+}
+
 function App() {
-  const [preferences, setPreferences] = useState({
+  const [preferences, setPreferences] = useState<DivePreferences>({
     experienceLevel: "",
     interests: [],
     season: "",
@@ -21,13 +31,13 @@ function App() {
     }
   }, [streamedResponse, isLoading, preferences, addToHistory]);
 
-  const experienceLevels = {
+  const experienceLevels: ExperienceLevels = {
     Beginner: "New to diving or have a few open water dives",
     Intermediate: "50+ dives and comfortable with various conditions",
     Advanced: "100+ dives with technical diving experience",
   };
 
-  const handlePreferenceChange = (type, value) => {
+  const handlePreferenceChange = (type: keyof DivePreferences, value: string): void => {
     setPreferences((prev) => {
       if (type === "interests") {
         const newInterests = prev.interests.includes(value)
@@ -39,7 +49,7 @@ function App() {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (
       !preferences.experienceLevel ||
       preferences.interests.length === 0 ||

@@ -72,7 +72,20 @@ export function useOpenAI(): UseOpenAIReturn {
       reset();
       setIsLoading(true);
 
-      const system = `You are a diving expert that recommends best diving destinations. Your answers are in Markdown format with a special separator so it can be easily shown in web-pages.`;
+      const system = `You are a diving expert that recommends best diving destinations. Your answers are in Markdown with the following format:
+      ---
+      ## <Title>
+      ---
+      ### 1. <Dive Location>
+      <Details as list>
+      ---
+      ### 2. <Dive Location>
+      <Details as list>
+      ---
+      ...
+      ---
+      <Summary>
+      `;
 
       const prompt = `As a diving expert, please recommend the best diving destinations based on these preferences:
       Experience Level: ${preferences.experienceLevel}

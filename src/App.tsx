@@ -7,7 +7,7 @@ import { RecommendationCard } from "./components/RecommendationCard";
 import { DebugPanel } from "./components/DebugPanel";
 import "./components/RecommendationCard.css";
 
-import { DivePreferences} from './types/diving';
+import { DivePreferences, ProcessedResponse } from './types/diving';
 import { AdditionalPreferences } from "./components/AdditionalPreferences";
 
 interface ExperienceLevels {
@@ -78,52 +78,45 @@ function App() {
     }
   };
 
-  const extractSummary = (text: string): { summary: string, remainingText: string } => {
-    const locationStart = text.match(/(?=###|\d+\.\s+(?:\*\*|[A-Z]))/m);
-    if (!locationStart) {
-      return { summary: "", remainingText: text };
-    }
-    const index = locationStart.index || 0;
-    return {
-      summary: text.slice(0, index).trim(),
-      remainingText: text.slice(index)
-    };
-  };
-
-  const processLocations = (text: string) => {
-    const sections = text.split(/---\n*/);
-    const filteredSections = sections.filter(section => section.trim());
-
-    // The first non-empty section might be the main title and introduction
-    let summary = '';
-    let locations = [];
-
-    for (let i = 0; i < filteredSections.length; i++) {
-      const section = filteredSections[i];
-      
-      // If this is the first section and it starts with ##, it's the main summary
-      if (i === 0 && section.trim().startsWith('##') && !section.trim().startsWith('###')) {
-        summary = section.trim();
-        continue;
-      }
-
-      // Process location sections (starting with ### for destination titles)
-      const destinationMatch = section.match(/### \d+\. ([^\n]+)/);
-      if (destinationMatch) {
-        const title = destinationMatch[1].trim();
-        // Remove the title line and trim any extra whitespace
-        const content = section.replace(/### \d+\. [^\n]+\n?/, '').trim();
+  const processLocations = (text: string): ProcessedResponse => {
+    // Split the text by "---" markers
+    const sections = text.split('---').map(section => section.trim());
+    
+    // Extract title from the first section (after ##)
+    const title = sections[0]?.replace(/^##\s*/, '').trim() || '';
+    
+    // Extract locations from middle sections (those starting with ###)
+    const locations = sections
+      .filter(section => section.startsWith('### '))
+      .map(section => {
+        // Extract location title (after the number)
+        const titleMatch = section.match(/### \d+\.\s*([^\n]+)/);
+        const locationTitle = titleMatch ? titleMatch[1].trim() : '';
         
-        // Only add if we have both title and content
-        if (title && content) {
-          locations.push({ title, content });
-        }
-      }
-    }
+        // Get content after the title
+        const content = section
+          .replace(/### \d+\.\s*[^\n]+/, '') // Remove the title line
+          .trim()
+          .split('\n')
+          .map(line => line.trim()) // Clean up each line
+          .filter(line => line.length > 0) // Remove empty lines
+          .join('\n');
+        
+        return {
+          title: locationTitle,
+          content: content
+        };
+      })
+      .filter(location => location.title && location.content);
+
+    // Extract summary from the last section
+    const summary = sections[sections.length - 1]?.replace(/^## Summary/, '').trim() || '';
+    
 
     return {
-      summary,
-      locations: locations
+      title,
+      locations,
+      summary
     };
   };
 
@@ -209,12 +202,9 @@ function App() {
 
       {streamedResponse && streamedResponse.trim() !== "" && (
         <div className="recommendations">
-          <h2>Your Personalized Recommendations</h2>
-          {processLocations(streamedResponse).summary && (
-            <div className="recommendations-summary">
-              {processLocations(streamedResponse).summary}
-            </div>
-          )}
+          <div className="recommendations-header">
+            <h2>{processLocations(streamedResponse).title}</h2>
+          </div>
           <div className="recommendation-grid">
             {processLocations(streamedResponse).locations.map((location, index) => (
               location.title && location.content && (
@@ -228,6 +218,12 @@ function App() {
               )
             ))}
           </div>
+          {processLocations(streamedResponse).summary && (
+            <div className="recommendations-summary">
+              <h3>Summary</h3>
+              <p>{processLocations(streamedResponse).summary}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -297,11 +293,9 @@ function App() {
                     </p>
                   )}
                 </div>
-                {processLocations(item.recommendation).summary && (
-                  <div className="recommendations-summary">
-                    {processLocations(item.recommendation).summary}
-                  </div>
-                )}
+                <div className="recommendations-header">
+                  <h3>{processLocations(item.recommendation).title}</h3>
+                </div>
                 <div className="recommendation-grid">
                   {processLocations(item.recommendation).locations.map((location, index) => (
                     location.title && location.content && (
@@ -315,6 +309,12 @@ function App() {
                     )
                   ))}
                 </div>
+                {processLocations(item.recommendation).summary && (
+                  <div className="recommendations-summary">
+                    <h3>Summary</h3>
+                    <p>{processLocations(item.recommendation).summary}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>

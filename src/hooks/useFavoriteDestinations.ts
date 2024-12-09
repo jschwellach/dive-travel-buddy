@@ -49,14 +49,10 @@ const saveFavoritesToStorage = (
 };
 
 export const useFavoriteDestinations = (): UseFavoriteDestinationsReturn => {
-  const [favorites, setFavorites] = useState<FavoriteDestination[]>([]);
   const userId = generateUserId();
-
-  useEffect(() => {
-    // Load favorites from localStorage on component mount
-    const savedFavorites = loadFavoritesFromStorage(userId);
-    setFavorites(savedFavorites);
-  }, [userId]);
+  const [favorites, setFavorites] = useState<FavoriteDestination[]>(() =>
+    loadFavoritesFromStorage(userId)
+  );
 
   useEffect(() => {
     // Save favorites to localStorage whenever they change

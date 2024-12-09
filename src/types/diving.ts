@@ -8,6 +8,17 @@ export interface DivePreferences {
   maxDepth: string;
 }
 
+export interface ProcessedLocation {
+  title: string;
+  content: string;
+}
+
+export interface ProcessedResponse {
+  title: string;
+  locations: ProcessedLocation[];
+  summary: string;
+}
+
 export const waterTemperatureOptions = {
   "Warm (>25°C/77°F)": "Tropical waters, minimal exposure suit needed",
   "Moderate (20-25°C/68-77°F)": "Comfortable with light wetsuit",

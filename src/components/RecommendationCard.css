@@ -12,15 +12,59 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.recommendation-card h3 {
+.recommendation-card-title {
+  flex: 1;
+}
+
+.recommendation-card-title h1,
+.recommendation-card-title h2,
+.recommendation-card-title h3,
+.recommendation-card-title h4 {
   color: #2b6cb0;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
+  margin: 0;
+  padding: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.recommendation-card-title p {
+  margin: 0;
+  padding: 0;
+}
+
+.recommendation-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.75rem;
 }
 
 .recommendation-card-content {
   color: #4a5568;
-  line-height: 1.6;
+  line-height: 1.8;
+}
+
+.recommendation-card-content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.recommendation-card-content li {
+  margin-bottom: 1rem;
+}
+
+.recommendation-card-content p {
+  margin-bottom: 1rem;
+}
+
+.recommendation-card-content strong {
+  color: #2d3748;
+  font-weight: 600;
+  display: inline-block;
+  margin-right: 0.5rem;
 }
 
 .recommendation-grid {
@@ -28,4 +72,23 @@
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 1.5rem;
+}
+
+.favorite-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #2b6cb0;
+  padding: 0.5rem;
+  transition: transform 0.2s ease;
+  margin-left: 1rem;
+}
+
+.favorite-button:hover {
+  transform: scale(1.1);
+}
+
+.favorite-button.favorited {
+  color: #f6e05e;
 }

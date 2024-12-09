@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown';
+
 interface RecommendationCardProps {
   title: string;
   content: string;
@@ -14,7 +16,9 @@ export function RecommendationCard({
   return (
     <div className="recommendation-card">
       <div className="recommendation-card-header">
-        <h3>{title}</h3>
+        <div className="recommendation-card-title">
+          <ReactMarkdown>{title}</ReactMarkdown>
+        </div>
         {onToggleFavorite && (
           <button 
             onClick={onToggleFavorite}
@@ -25,7 +29,7 @@ export function RecommendationCard({
         )}
       </div>
       <div className="recommendation-card-content">
-        {content}
+        <ReactMarkdown>{content}</ReactMarkdown>
       </div>
     </div>
   );

@@ -69,7 +69,7 @@ export async function createStreamingCompletion(
       method: "POST",
       headers: API_CONFIG.headers,
       body: JSON.stringify({
-        model: "gpt-4",
+        model: "gpt-4o",
         messages: [{ role: "user", content: prompt }],
         stream: true,
       }),

@@ -28,15 +28,17 @@
 
 - [x] Add recommendation history
 - [x] Recommendation layout doesn't look good, it would be better to have a cards like layout per location if it's possible from the response
-- [ ] Implement save/bookmark functionality for favorite destinations
-- [ ] Instead of Beginner, Intermediate, Advance, we should also allow the user to specify the certification from PADI or SSI or TDI etc.
-- [ ] Add more detailed diving preferences (water temperature, visibility, etc.)
+- [x] Implement save/bookmark functionality for favorite destinations
+- [x] Instead of Beginner, Intermediate, Advance, we should also allow the user to specify the certification from PADI or SSI or TDI etc.
+- [x] Add more detailed diving preferences (water temperature, visibility, etc.)
+- [ ] The Additional Preferences should be moved to a section below the other settings that spans the whole widths of that area and within the sections should be arranged smaller and with check boxes
+- [ ] Travel Season is only considering northern hemisphere, better to use calendar months?
 - [ ] Add images for recommended destinations
 - [ ] Add weather information for recommended locations
 
 ### 4. Technical Improvements
 
-- [ ] Add proper TypeScript support
+- [x] Add proper TypeScript support
 - [ ] Implement proper state management (Context or Redux)
 - [ ] Add unit tests for components
 - [ ] Add E2E tests for main user flows

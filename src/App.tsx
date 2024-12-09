@@ -6,11 +6,8 @@ import "./App.css";
 import { RecommendationCard } from "./components/RecommendationCard";
 import "./components/RecommendationCard.css";
 
-interface DivePreferences {
-  experienceLevel: string;
-  interests: string[];
-  season: string;
-}
+import { DivePreferences} from './types/diving';
+import { AdditionalPreferences } from "./components/AdditionalPreferences";
 
 interface ExperienceLevels {
   [key: string]: string;
@@ -21,6 +18,10 @@ function App() {
     experienceLevel: "",
     interests: [],
     season: "",
+    waterTemperature: "",
+    visibility: "",
+    currentStrength: "",
+    maxDepth: ""
   });
 
   const { isLoading, error, streamedResponse, getRecommendations } =
@@ -112,6 +113,11 @@ function App() {
           </div>
         </div>
 
+        <AdditionalPreferences
+          preferences={preferences}
+          onPreferenceChange={handlePreferenceChange}
+        />
+
         <div className="preference-card">
           <h3>Travel Season</h3>
           <div className="button-group">
@@ -154,6 +160,12 @@ function App() {
                     key={index}
                     title={title}
                     content={content}
+                    isFavorite={isFavorite(title)}
+                    onToggleFavorite={() => 
+                      isFavorite(title)
+                        ? removeFromFavorites(favorites.find(f => f.title === title)?.id!)
+                        : addToFavorites(title, content)
+                    }
                   />
                 )
               );
@@ -203,6 +215,30 @@ function App() {
                   <p>
                     <strong>Season:</strong> {item.preferences.season}
                   </p>
+                  {item.preferences.waterTemperature && (
+                    <p>
+                      <strong>Water Temperature:</strong>{" "}
+                      {item.preferences.waterTemperature}
+                    </p>
+                  )}
+                  {item.preferences.visibility && (
+                    <p>
+                      <strong>Visibility:</strong>{" "}
+                      {item.preferences.visibility}
+                    </p>
+                  )}
+                  {item.preferences.currentStrength && (
+                    <p>
+                      <strong>Current:</strong>{" "}
+                      {item.preferences.currentStrength}
+                    </p>
+                  )}
+                  {item.preferences.maxDepth && (
+                    <p>
+                      <strong>Max Depth:</strong>{" "}
+                      {item.preferences.maxDepth}
+                    </p>
+                  )}
                 </div>
                 <div className="recommendation-grid">
                   {item.recommendation.split('\n\n').map((location, index) => {

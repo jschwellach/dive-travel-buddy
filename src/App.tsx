@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { useOpenAI } from "./hooks/useOpenAI";
 import { useRecommendationHistory } from "./hooks/useRecommendationHistory";
+import { useFavoriteDestinations } from "./hooks/useFavoriteDestinations";
 import "./App.css";
+import { RecommendationCard } from "./components/RecommendationCard";
+import "./components/RecommendationCard.css";
 
 interface DivePreferences {
   experienceLevel: string;
@@ -23,6 +26,7 @@ function App() {
   const { isLoading, error, streamedResponse, getRecommendations } =
     useOpenAI();
   const { history, addToHistory, clearHistory } = useRecommendationHistory();
+  const { favorites, addToFavorites, removeFromFavorites, isFavorite } = useFavoriteDestinations();
 
   // Update history when streamedResponse changes
   useEffect(() => {
@@ -32,9 +36,11 @@ function App() {
   }, [streamedResponse, isLoading, preferences, addToHistory]);
 
   const experienceLevels: ExperienceLevels = {
-    Beginner: "New to diving or have a few open water dives",
-    Intermediate: "50+ dives and comfortable with various conditions",
-    Advanced: "100+ dives with technical diving experience",
+    "Open Water": "Basic certification (PADI/SSI Open Water Diver or equivalent)",
+    "Advanced": "Advanced certification (PADI/SSI Advanced Open Water or equivalent)",
+    "Rescue": "Rescue Diver certification (PADI/SSI Rescue Diver or equivalent)",
+    "Professional": "Professional level (Divemaster/Instructor or equivalent)",
+    "Technical": "Technical diving certification (TDI/PADI Tec certifications)"
   };
 
   const handlePreferenceChange = (type: keyof DivePreferences, value: string): void => {
@@ -137,9 +143,37 @@ function App() {
       {streamedResponse && streamedResponse.trim() !== "" && (
         <div className="recommendations">
           <h2>Your Personalized Recommendations</h2>
-          <div className="recommendation-content">
-            {streamedResponse.split("\n").map((line, index) => (
-              <p key={index}>{line}</p>
+          <div className="recommendation-grid">
+            {streamedResponse.split('\n\n').map((location, index) => {
+              const lines = location.trim().split('\n');
+              const title = lines[0];
+              const content = lines.slice(1).join('\n');
+              return (
+                title && content && (
+                  <RecommendationCard
+                    key={index}
+                    title={title}
+                    content={content}
+                  />
+                )
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {favorites && favorites.length > 0 && (
+        <div className="favorites-section">
+          <h2>Favorite Destinations</h2>
+          <div className="recommendation-grid">
+            {favorites.map((item) => (
+              <RecommendationCard
+                key={item.id}
+                title={item.title}
+                content={item.content}
+                isFavorite={true}
+                onToggleFavorite={() => removeFromFavorites(item.id)}
+              />
             ))}
           </div>
         </div>
@@ -170,10 +204,27 @@ function App() {
                     <strong>Season:</strong> {item.preferences.season}
                   </p>
                 </div>
-                <div className="history-recommendation">
-                  {item.recommendation.split("\n").map((line, index) => (
-                    <p key={index}>{line}</p>
-                  ))}
+                <div className="recommendation-grid">
+                  {item.recommendation.split('\n\n').map((location, index) => {
+                    const lines = location.trim().split('\n');
+                    const title = lines[0];
+                    const content = lines.slice(1).join('\n');
+                    return (
+                      title && content && (
+                        <RecommendationCard
+                          key={index}
+                          title={title}
+                          content={content}
+                          isFavorite={isFavorite(title)}
+                          onToggleFavorite={() => 
+                            isFavorite(title)
+                              ? removeFromFavorites(favorites.find(f => f.title === title)?.id!)
+                              : addToFavorites(title, content)
+                          }
+                        />
+                      )
+                    );
+                  })}
                 </div>
               </div>
             ))}

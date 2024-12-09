@@ -5,12 +5,6 @@
 // Check if API key is available
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
-if (!OPENAI_API_KEY) {
-  throw new Error(
-    "OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your .env file."
-  );
-}
-
 // API configuration
 const API_CONFIG = {
   baseURL: "https://api.openai.com/v1",

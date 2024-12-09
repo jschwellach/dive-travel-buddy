@@ -27,7 +27,7 @@
 ### 3. Features
 
 - [x] Add recommendation history
-- [ ] Recommendation layout doesn't look good, it would be better to have a cards like layout per location if it's possible from the response
+- [x] Recommendation layout doesn't look good, it would be better to have a cards like layout per location if it's possible from the response
 - [ ] Implement save/bookmark functionality for favorite destinations
 - [ ] Instead of Beginner, Intermediate, Advance, we should also allow the user to specify the certification from PADI or SSI or TDI etc.
 - [ ] Add more detailed diving preferences (water temperature, visibility, etc.)

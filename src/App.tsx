@@ -4,6 +4,7 @@ import { useRecommendationHistory } from "./hooks/useRecommendationHistory";
 import { useFavoriteDestinations } from "./hooks/useFavoriteDestinations";
 import "./App.css";
 import { RecommendationCard } from "./components/RecommendationCard";
+import { DebugPanel } from "./components/DebugPanel";
 import "./components/RecommendationCard.css";
 
 import { DivePreferences} from './types/diving';
@@ -24,7 +25,7 @@ function App() {
     maxDepth: ""
   });
 
-  const { isLoading, error, streamedResponse, getRecommendations } =
+  const { isLoading, error, streamedResponse, debugInfo, getRecommendations } =
     useOpenAI();
   const { history, addToHistory, clearHistory } = useRecommendationHistory();
   const { favorites, addToFavorites, removeFromFavorites, isFavorite } = useFavoriteDestinations();
@@ -66,6 +67,64 @@ function App() {
       return;
     }
     await getRecommendations(preferences);
+  };
+
+  const handleToggleFavorite = (title: string, content: string) => {
+    const favorite = favorites.find(f => f.title === title);
+    if (favorite) {
+      removeFromFavorites(favorite.id);
+    } else {
+      addToFavorites(title, content);
+    }
+  };
+
+  const extractSummary = (text: string): { summary: string, remainingText: string } => {
+    const locationStart = text.match(/(?=###|\d+\.\s+(?:\*\*|[A-Z]))/m);
+    if (!locationStart) {
+      return { summary: "", remainingText: text };
+    }
+    const index = locationStart.index || 0;
+    return {
+      summary: text.slice(0, index).trim(),
+      remainingText: text.slice(index)
+    };
+  };
+
+  const processLocations = (text: string) => {
+    const sections = text.split(/---\n*/);
+    const filteredSections = sections.filter(section => section.trim());
+
+    // The first non-empty section might be the main title and introduction
+    let summary = '';
+    let locations = [];
+
+    for (let i = 0; i < filteredSections.length; i++) {
+      const section = filteredSections[i];
+      
+      // If this is the first section and it starts with ##, it's the main summary
+      if (i === 0 && section.trim().startsWith('##') && !section.trim().startsWith('###')) {
+        summary = section.trim();
+        continue;
+      }
+
+      // Process location sections (starting with ### for destination titles)
+      const destinationMatch = section.match(/### \d+\. ([^\n]+)/);
+      if (destinationMatch) {
+        const title = destinationMatch[1].trim();
+        // Remove the title line and trim any extra whitespace
+        const content = section.replace(/### \d+\. [^\n]+\n?/, '').trim();
+        
+        // Only add if we have both title and content
+        if (title && content) {
+          locations.push({ title, content });
+        }
+      }
+    }
+
+    return {
+      summary,
+      locations: locations
+    };
   };
 
   return (
@@ -113,11 +172,6 @@ function App() {
           </div>
         </div>
 
-        <AdditionalPreferences
-          preferences={preferences}
-          onPreferenceChange={handlePreferenceChange}
-        />
-
         <div className="preference-card">
           <h3>Travel Season</h3>
           <div className="button-group">
@@ -131,6 +185,13 @@ function App() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="preference-card additional-preferences">
+          <AdditionalPreferences
+            preferences={preferences}
+            onPreferenceChange={handlePreferenceChange}
+          />
         </div>
       </div>
 
@@ -149,27 +210,23 @@ function App() {
       {streamedResponse && streamedResponse.trim() !== "" && (
         <div className="recommendations">
           <h2>Your Personalized Recommendations</h2>
+          {processLocations(streamedResponse).summary && (
+            <div className="recommendations-summary">
+              {processLocations(streamedResponse).summary}
+            </div>
+          )}
           <div className="recommendation-grid">
-            {streamedResponse.split('\n\n').map((location, index) => {
-              const lines = location.trim().split('\n');
-              const title = lines[0];
-              const content = lines.slice(1).join('\n');
-              return (
-                title && content && (
-                  <RecommendationCard
-                    key={index}
-                    title={title}
-                    content={content}
-                    isFavorite={isFavorite(title)}
-                    onToggleFavorite={() => 
-                      isFavorite(title)
-                        ? removeFromFavorites(favorites.find(f => f.title === title)?.id!)
-                        : addToFavorites(title, content)
-                    }
-                  />
-                )
-              );
-            })}
+            {processLocations(streamedResponse).locations.map((location, index) => (
+              location.title && location.content && (
+                <RecommendationCard
+                  key={index}
+                  title={location.title}
+                  content={location.content}
+                  isFavorite={isFavorite(location.title)}
+                  onToggleFavorite={() => handleToggleFavorite(location.title, location.content)}
+                />
+              )
+            ))}
           </div>
         </div>
       )}
@@ -240,33 +297,30 @@ function App() {
                     </p>
                   )}
                 </div>
+                {processLocations(item.recommendation).summary && (
+                  <div className="recommendations-summary">
+                    {processLocations(item.recommendation).summary}
+                  </div>
+                )}
                 <div className="recommendation-grid">
-                  {item.recommendation.split('\n\n').map((location, index) => {
-                    const lines = location.trim().split('\n');
-                    const title = lines[0];
-                    const content = lines.slice(1).join('\n');
-                    return (
-                      title && content && (
-                        <RecommendationCard
-                          key={index}
-                          title={title}
-                          content={content}
-                          isFavorite={isFavorite(title)}
-                          onToggleFavorite={() => 
-                            isFavorite(title)
-                              ? removeFromFavorites(favorites.find(f => f.title === title)?.id!)
-                              : addToFavorites(title, content)
-                          }
-                        />
-                      )
-                    );
-                  })}
+                  {processLocations(item.recommendation).locations.map((location, index) => (
+                    location.title && location.content && (
+                      <RecommendationCard
+                        key={index}
+                        title={location.title}
+                        content={location.content}
+                        isFavorite={isFavorite(location.title)}
+                        onToggleFavorite={() => handleToggleFavorite(location.title, location.content)}
+                      />
+                    )
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         </div>
       )}
+      <DebugPanel debugInfo={debugInfo} />
     </div>
   );
 }

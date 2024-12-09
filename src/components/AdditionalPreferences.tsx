@@ -14,7 +14,7 @@ export const AdditionalPreferences: React.FC<AdditionalPreferencesProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="preference-card">
+    <div>
       <div 
         className="additional-preferences-header" 
         onClick={() => setIsExpanded(!isExpanded)}
@@ -27,64 +27,68 @@ export const AdditionalPreferences: React.FC<AdditionalPreferencesProps> = ({
         <div className="additional-preferences-content">
           <div className="preference-group">
             <h4>Water Temperature</h4>
-            <div className="button-group">
+            <div className="checkbox-group">
               {Object.entries(waterTemperatureOptions).map(([temp, description]) => (
-                <button
-                  key={temp}
-                  className={preferences.waterTemperature === temp ? "active" : ""}
-                  onClick={() => onPreferenceChange("waterTemperature", temp)}
-                  data-tooltip={description}
-                >
-                  {temp}
-                </button>
+                <div key={temp} className="checkbox-item">
+                  <input
+                    type="checkbox"
+                    id={`temp-${temp}`}
+                    checked={preferences.waterTemperature === temp}
+                    onChange={() => onPreferenceChange("waterTemperature", preferences.waterTemperature === temp ? "" : temp)}
+                  />
+                  <label htmlFor={`temp-${temp}`} title={description}>{temp}</label>
+                </div>
               ))}
             </div>
           </div>
 
           <div className="preference-group">
             <h4>Visibility</h4>
-            <div className="button-group">
+            <div className="checkbox-group">
               {Object.entries(visibilityOptions).map(([vis, description]) => (
-                <button
-                  key={vis}
-                  className={preferences.visibility === vis ? "active" : ""}
-                  onClick={() => onPreferenceChange("visibility", vis)}
-                  data-tooltip={description}
-                >
-                  {vis}
-                </button>
+                <div key={vis} className="checkbox-item">
+                  <input
+                    type="checkbox"
+                    id={`vis-${vis}`}
+                    checked={preferences.visibility === vis}
+                    onChange={() => onPreferenceChange("visibility", preferences.visibility === vis ? "" : vis)}
+                  />
+                  <label htmlFor={`vis-${vis}`} title={description}>{vis}</label>
+                </div>
               ))}
             </div>
           </div>
 
           <div className="preference-group">
             <h4>Current Strength</h4>
-            <div className="button-group">
+            <div className="checkbox-group">
               {Object.entries(currentStrengthOptions).map(([current, description]) => (
-                <button
-                  key={current}
-                  className={preferences.currentStrength === current ? "active" : ""}
-                  onClick={() => onPreferenceChange("currentStrength", current)}
-                  data-tooltip={description}
-                >
-                  {current}
-                </button>
+                <div key={current} className="checkbox-item">
+                  <input
+                    type="checkbox"
+                    id={`current-${current}`}
+                    checked={preferences.currentStrength === current}
+                    onChange={() => onPreferenceChange("currentStrength", preferences.currentStrength === current ? "" : current)}
+                  />
+                  <label htmlFor={`current-${current}`} title={description}>{current}</label>
+                </div>
               ))}
             </div>
           </div>
 
           <div className="preference-group">
             <h4>Maximum Depth</h4>
-            <div className="button-group">
+            <div className="checkbox-group">
               {Object.entries(maxDepthOptions).map(([depth, description]) => (
-                <button
-                  key={depth}
-                  className={preferences.maxDepth === depth ? "active" : ""}
-                  onClick={() => onPreferenceChange("maxDepth", depth)}
-                  data-tooltip={description}
-                >
-                  {depth}
-                </button>
+                <div key={depth} className="checkbox-item">
+                  <input
+                    type="checkbox"
+                    id={`depth-${depth}`}
+                    checked={preferences.maxDepth === depth}
+                    onChange={() => onPreferenceChange("maxDepth", preferences.maxDepth === depth ? "" : depth)}
+                  />
+                  <label htmlFor={`depth-${depth}`} title={description}>{depth}</label>
+                </div>
               ))}
             </div>
           </div>

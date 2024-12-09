@@ -30,6 +30,34 @@
   animation: slideUp 0.6s ease-out;
 }
 
+.additional-preferences {
+  grid-column: 1 / -1;
+  margin-top: 1rem;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.checkbox-item label {
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
 .preference-card {
   background: white;
   border-radius: 10px;
@@ -184,13 +212,26 @@ button.active {
   font-size: 1.2rem;
 }
 
-.recommendations, .history-section {
+.recommendations, .history-section, .favorites-section {
   margin-top: 3rem;
   padding: 2rem;
   background: white;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.6s ease-out;
+}
+
+.recommendations-summary {
+  background: #ebf8ff;
+  border-left: 4px solid #2b6cb0;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 6px;
+  color: #2d3748;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 4px rgba(43, 108, 176, 0.1);
+  animation: slideIn 0.4s ease-out;
 }
 
 .history-header {
@@ -224,7 +265,7 @@ button.active {
   transform: translateY(0);
 }
 
-.recommendations h2, .history-section h2 {
+.recommendations h2, .history-section h2, .favorites-section h2 {
   color: #2b6cb0;
   text-align: center;
 }
@@ -350,9 +391,15 @@ button.active {
     grid-template-columns: 1fr;
   }
 
-  .recommendations, .history-section {
+  .recommendations, .history-section, .favorites-section {
     padding: 1.25rem;
     margin-top: 2rem;
+  }
+
+  .recommendations-summary {
+    padding: 1rem;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .history-item {

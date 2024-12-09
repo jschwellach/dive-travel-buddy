@@ -39,6 +39,7 @@ export type CompleteCallback = () => void;
  * Creates a streaming chat completion request
  */
 export async function createStreamingCompletion(
+  system: string,
   prompt: string,
   onChunk: ChunkCallback,
   onError: ErrorCallback,
@@ -70,7 +71,10 @@ export async function createStreamingCompletion(
       headers: API_CONFIG.headers,
       body: JSON.stringify({
         model: "gpt-4o",
-        messages: [{ role: "user", content: prompt }],
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: prompt },
+        ],
         stream: true,
       }),
     });

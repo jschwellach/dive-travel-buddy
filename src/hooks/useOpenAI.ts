@@ -11,10 +11,20 @@ interface DivePreferences {
   season: string;
 }
 
+interface DebugInfo {
+  timestamp: string;
+  system: string;
+  prompt: string;
+  preferences: DivePreferences;
+  response: string;
+  error?: string;
+}
+
 interface UseOpenAIReturn {
   isLoading: boolean;
   error: string | null;
   streamedResponse: string;
+  debugInfo: DebugInfo[];
   getRecommendations: (preferences: DivePreferences) => Promise<string | null>;
   reset: () => void;
 }
@@ -23,6 +33,7 @@ interface UseOpenAIReturn {
  * Custom hook for managing OpenAI API interactions
  */
 export function useOpenAI(): UseOpenAIReturn {
+  const [debugInfo, setDebugInfo] = useState<DebugInfo[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [streamedResponse, setStreamedResponse] = useState<string>("");
@@ -36,6 +47,23 @@ export function useOpenAI(): UseOpenAIReturn {
     setStreamedResponse("");
   }, []);
 
+  const addDebugEntry = useCallback(
+    (
+      system: string,
+      prompt: string,
+      preferences: DivePreferences,
+      response: string,
+      error?: string
+    ) => {
+      const timestamp = new Date().toLocaleString();
+      setDebugInfo((prev) => [
+        ...prev,
+        { timestamp, system, prompt, preferences, response, error },
+      ]);
+    },
+    []
+  );
+
   /**
    * Get travel recommendations based on user preferences
    */
@@ -43,6 +71,8 @@ export function useOpenAI(): UseOpenAIReturn {
     async (preferences: DivePreferences): Promise<string | null> => {
       reset();
       setIsLoading(true);
+
+      const system = `You are a diving expert that recommends best diving destinations. Your answers are in Markdown format with a special separator so it can be easily shown in web-pages.`;
 
       const prompt = `As a diving expert, please recommend the best diving destinations based on these preferences:
       Experience Level: ${preferences.experienceLevel}
@@ -61,6 +91,7 @@ export function useOpenAI(): UseOpenAIReturn {
         let fullResponse = "";
 
         await createStreamingCompletion(
+          system,
           prompt,
           (chunk) => {
             fullResponse += chunk;
@@ -87,6 +118,8 @@ export function useOpenAI(): UseOpenAIReturn {
             }
 
             setError(errorMessage);
+            console.error("OpenAI API error:", error);
+            addDebugEntry(system, prompt, preferences, "", errorMessage);
             setIsLoading(false);
             return null;
           },
@@ -95,6 +128,7 @@ export function useOpenAI(): UseOpenAIReturn {
           }
         );
 
+        addDebugEntry(system, prompt, preferences, fullResponse);
         return fullResponse;
       } catch (error) {
         setError("Failed to get recommendations. Please try again.");
@@ -106,6 +140,7 @@ export function useOpenAI(): UseOpenAIReturn {
   );
 
   return {
+    debugInfo,
     isLoading,
     error,
     streamedResponse,

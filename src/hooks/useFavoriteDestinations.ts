@@ -25,21 +25,42 @@ const generateUserId = (): string => {
   return newId;
 };
 
+const loadFavoritesFromStorage = (userId: string): FavoriteDestination[] => {
+  try {
+    const savedFavorites = localStorage.getItem(`favorites_${userId}`);
+    if (savedFavorites) {
+      return JSON.parse(savedFavorites);
+    }
+  } catch (error) {
+    console.error("Error loading favorites:", error);
+  }
+  return [];
+};
+
+const saveFavoritesToStorage = (
+  userId: string,
+  favorites: FavoriteDestination[]
+): void => {
+  try {
+    localStorage.setItem(`favorites_${userId}`, JSON.stringify(favorites));
+  } catch (error) {
+    console.error("Error saving favorites:", error);
+  }
+};
+
 export const useFavoriteDestinations = (): UseFavoriteDestinationsReturn => {
   const [favorites, setFavorites] = useState<FavoriteDestination[]>([]);
   const userId = generateUserId();
 
   useEffect(() => {
     // Load favorites from localStorage on component mount
-    const savedFavorites = localStorage.getItem(`favorites_${userId}`);
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
+    const savedFavorites = loadFavoritesFromStorage(userId);
+    setFavorites(savedFavorites);
   }, [userId]);
 
   useEffect(() => {
     // Save favorites to localStorage whenever they change
-    localStorage.setItem(`favorites_${userId}`, JSON.stringify(favorites));
+    saveFavoritesToStorage(userId, favorites);
   }, [favorites, userId]);
 
   const addToFavorites = useCallback(
@@ -52,13 +73,23 @@ export const useFavoriteDestinations = (): UseFavoriteDestinationsReturn => {
         userId,
       };
 
-      setFavorites((prev) => [...prev, newFavorite]);
+      setFavorites((prev) => {
+        // Prevent duplicates
+        if (prev.some((f) => f.title === title)) {
+          return prev;
+        }
+        return [...prev, newFavorite];
+      });
       return newFavorite;
     },
     [userId]
   );
 
   const removeFromFavorites = useCallback((id: number): void => {
+    if (typeof id !== "number") {
+      console.error("Invalid ID provided to removeFromFavorites:", id);
+      return;
+    }
     setFavorites((prev) => prev.filter((favorite) => favorite.id !== id));
   }, []);
 

@@ -1,10 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-
-interface DivePreferences {
-  experienceLevel: string;
-  interests: string[];
-  season: string;
-}
+import { DivePreferences } from "../types/diving";
 
 interface HistoryItem {
   id: number;

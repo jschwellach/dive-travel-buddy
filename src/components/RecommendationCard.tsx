@@ -17,7 +17,7 @@ export function RecommendationCard({
     <div className="recommendation-card">
       <div className="recommendation-card-header">
         <div className="recommendation-card-title">
-          <ReactMarkdown>{title}</ReactMarkdown>
+          <h3><ReactMarkdown>{title}</ReactMarkdown></h3>
         </div>
         {onToggleFavorite && (
           <button 

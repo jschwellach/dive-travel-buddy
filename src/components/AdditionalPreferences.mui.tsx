@@ -10,6 +10,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import Tooltip from '@mui/material/Tooltip';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 
 interface AdditionalPreferencesProps {
   preferences: DivePreferences;
@@ -31,19 +32,19 @@ const PreferenceSection = ({
   value: string[];
   onChange: (newValue: string[]) => void;
 }) => (
-  <Box sx={{ my: 2 }}>
-    <Typography variant="h6" gutterBottom>{title}</Typography>
+  <Box sx={{ mb: 2 }}>
+    <Typography variant="subtitle1" gutterBottom>{title}</Typography>
     <ToggleButtonGroup
       value={value}
       onChange={(_, newValue) => onChange(newValue)}
       aria-label={title}
-      multiple
       fullWidth
+      size="small"
       sx={{ 
         flexWrap: 'wrap',
         '& .MuiToggleButton-root': {
-          flex: { xs: '1 1 calc(50% - 8px)', sm: '1 1 calc(33.33% - 8px)' },
-          m: 0.5,
+          flex: { xs: '1 1 calc(50% - 4px)', sm: '1 1 auto' },
+          py: 0.5
         }
       }}
     >
@@ -79,46 +80,54 @@ export const AdditionalPreferences: React.FC<AdditionalPreferencesProps> = ({
         aria-controls="additional-preferences-content"
         id="additional-preferences-header"
       >
-        <Typography variant="h5">Additional Preferences</Typography>
+        <Typography variant="subtitle1">Additional Preferences</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Box sx={{ p: 2 }}>
-          <PreferenceSection
-            title="Water Temperature"
-            options={waterTemperatureOptions}
-            value={preferences.waterTemperature}
-            onChange={(newValue) => onPreferenceChange('waterTemperature', newValue)}
-          />
-
-          <PreferenceSection
-            title="Visibility"
-            options={visibilityOptions}
-            value={preferences.visibility}
-            onChange={(newValue) => onPreferenceChange('visibility', newValue)}
-          />
-
-          <PreferenceSection
-            title="Current Strength"
-            options={currentStrengthOptions}
-            value={preferences.currentStrength}
-            onChange={(newValue) => onPreferenceChange('currentStrength', newValue)}
-          />
-
-          <PreferenceSection
-            title="Maximum Depth"
-            options={maxDepthOptions}
-            value={preferences.maxDepth}
-            onChange={(newValue) => onPreferenceChange('maxDepth', newValue)}
-          />
-
-          <PreferenceSection
-            title="Preferred Regions"
-            options={regionOptions}
-            value={preferences.regions}
-            onChange={(newValue) => onPreferenceChange('regions', newValue)}
-          />
-        </Box>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <PreferenceSection
+              title="Water Temperature"
+              options={waterTemperatureOptions}
+              value={preferences.waterTemperature}
+              onChange={(newValue) => onPreferenceChange('waterTemperature', newValue)}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <PreferenceSection
+              title="Visibility"
+              options={visibilityOptions}
+              value={preferences.visibility}
+              onChange={(newValue) => onPreferenceChange('visibility', newValue)}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <PreferenceSection
+              title="Current Strength"
+              options={currentStrengthOptions}
+              value={preferences.currentStrength}
+              onChange={(newValue) => onPreferenceChange('currentStrength', newValue)}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <PreferenceSection
+              title="Maximum Depth"
+              options={maxDepthOptions}
+              value={preferences.maxDepth}
+              onChange={(newValue) => onPreferenceChange('maxDepth', newValue)}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <PreferenceSection
+              title="Preferred Regions"
+              options={regionOptions}
+              value={preferences.regions}
+              onChange={(newValue) => onPreferenceChange('regions', newValue)}
+            />
+          </Grid>
+        </Grid>
       </AccordionDetails>
     </Accordion>
   );
 };
+
+export default AdditionalPreferences;

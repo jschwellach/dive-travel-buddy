@@ -26,6 +26,19 @@ interface ExperienceLevels {
   [key: string]: string;
 }
 
+const PreferenceSection = ({
+  title,
+  children
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <Box>
+    <Typography variant="subtitle1" gutterBottom>{title}</Typography>
+    {children}
+  </Box>
+);
+
 function App() {
   const [preferences, setPreferences] = useState<DivePreferences>({
     experienceLevel: "",
@@ -37,6 +50,7 @@ function App() {
     maxDepth: [],
     regions: []
   });
+  const [isStreamingComplete, setIsStreamingComplete] = useState(false);
 
   const { isLoading: isOpenAILoading, error, streamedResponse, getRecommendations } = useOpenAI();
   const { history, addToHistory, clearHistory } = useRecommendationHistory();
@@ -45,6 +59,14 @@ function App() {
 
   const isLoading = isOpenAILoading || isCacheLoading;
   const displayedResponse = streamedResponse || cachedRecommendations;
+
+  useEffect(() => {
+    if (!isOpenAILoading && streamedResponse) {
+      setIsStreamingComplete(true);
+    } else if (isOpenAILoading) {
+      setIsStreamingComplete(false);
+    }
+  }, [isOpenAILoading, streamedResponse]);
 
   useEffect(() => {
     if (streamedResponse && streamedResponse.trim() !== "" && !isOpenAILoading) {
@@ -130,210 +152,266 @@ function App() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box component="header" sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Dive Travel Buddy
-        </Typography>
-        <Typography variant="h5" color="text.secondary">
-          Find your perfect diving destination
-        </Typography>
-      </Box>
-
-      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" gutterBottom>Experience Level</Typography>
-          <ToggleButtonGroup
-            value={preferences.experienceLevel}
-            exclusive
-            onChange={(_, value) => handlePreferenceChange("experienceLevel", value)}
-            fullWidth
-            sx={{ flexWrap: 'wrap' }}
-          >
-            {Object.entries(experienceLevels).map(([level, description]) => (
-              <Tooltip key={level} title={description} arrow>
-                <ToggleButton value={level} sx={{ flex: { xs: '1 1 100%', sm: '1 1 auto' } }}>
-                  {level}
-                </ToggleButton>
-              </Tooltip>
-            ))}
-          </ToggleButtonGroup>
-        </Box>
-
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" gutterBottom>Diving Interests</Typography>
-          <ToggleButtonGroup
-            value={preferences.interests}
-            onChange={(_, value) => handlePreferenceChange("interests", value)}
-            multiple
-            fullWidth
-            sx={{ flexWrap: 'wrap' }}
-          >
-            {["Coral Reefs", "Wreck Diving", "Marine Life", "Cave Diving"].map((interest) => (
-              <ToggleButton
-                key={interest}
-                value={interest}
-                sx={{ flex: { xs: '1 1 50%', sm: '1 1 auto' } }}
-              >
-                {interest}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-        </Box>
-
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" gutterBottom>Travel Season</Typography>
-          <ToggleButtonGroup
-            value={preferences.season}
-            onChange={(_, value) => handlePreferenceChange("season", value)}
-            multiple
-            fullWidth
-            sx={{ flexWrap: 'wrap' }}
-          >
-            {Object.entries(monthOptions).map(([months, description]) => (
-              <Tooltip key={months} title={description} arrow>
-                <ToggleButton value={months} sx={{ flex: { xs: '1 1 50%', sm: '1 1 auto' } }}>
-                  {months}
-                </ToggleButton>
-              </Tooltip>
-            ))}
-          </ToggleButtonGroup>
-        </Box>
-
-        <AdditionalPreferences
-          preferences={preferences}
-          onPreferenceChange={handlePreferenceChange}
-        />
-      </Paper>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 4 }}>{error}</Alert>
-      )}
-
-      <Button
-        variant="contained"
-        size="large"
-        fullWidth
-        onClick={handleSubmit}
-        disabled={isLoading}
-        sx={{ mb: 4 }}
-        startIcon={isLoading && <CircularProgress size={24} color="inherit" />}
-      >
-        {isLoading ? "Finding Perfect Destinations..." : "Find My Perfect Destination"}
-      </Button>
-
-      {displayedResponse && displayedResponse.trim() !== "" && (
-        <Box sx={{ mb: 6 }}>
-          <Typography variant="h4" gutterBottom align="center">
-            {processLocations(displayedResponse).title}
+    <Box sx={{ py: 4 }}>
+      <Container maxWidth="xl">
+        <Box component="header" sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography variant="h2" component="h1" gutterBottom>
+            Dive Travel Buddy
           </Typography>
-          <Grid container spacing={3}>
-            {processLocations(displayedResponse).locations.map((location, index) => (
-              location.title && location.content && (
-                <Grid item xs={12} md={6} key={index}>
-                  <RecommendationCard
-                    title={location.title}
-                    content={location.content}
-                    isFavorite={isFavorite(location.title)}
-                    onToggleFavorite={() => handleToggleFavorite(location.title, location.content)}
-                  />
-                </Grid>
-              )
-            ))}
-          </Grid>
-          {processLocations(displayedResponse).summary && (
-            <Box sx={{ mt: 4 }}>
-              <Typography variant="h5" gutterBottom>Summary</Typography>
-              <Typography>{processLocations(displayedResponse).summary}</Typography>
-            </Box>
-          )}
+          <Typography variant="h5" color="text.secondary">
+            Find your perfect diving destination
+          </Typography>
         </Box>
-      )}
 
-      {favorites && favorites.length > 0 && (
-        <Box sx={{ mb: 6 }}>
-          <Typography variant="h4" gutterBottom>Favorite Destinations</Typography>
-          <Grid container spacing={3}>
-            {favorites.map((item) => (
-              <Grid item xs={12} md={6} key={item.id}>
-                <RecommendationCard
-                  title={item.title}
-                  content={item.content}
-                  isFavorite={true}
-                  onToggleFavorite={() => removeFromFavorites(item.id)}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      )}
+        <Grid container spacing={3}>
+          {/* Left Column - Search Preferences */}
+          <Grid item xs={12} lg={3}>
+            <Box sx={{ position: 'sticky', top: 16 }}>
+              <Paper sx={{ p: 2 }}>
+                <Typography variant="h6" gutterBottom>Search Preferences</Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <PreferenceSection title="Experience Level">
+                      <ToggleButtonGroup
+                        value={preferences.experienceLevel}
+                        exclusive
+                        onChange={(_, value) => handlePreferenceChange("experienceLevel", value)}
+                        fullWidth
+                        size="small"
+                        sx={{ 
+                          flexWrap: 'wrap',
+                          '& .MuiToggleButton-root': {
+                            flex: '1 1 100%',
+                            py: 0.5
+                          }
+                        }}
+                      >
+                        {Object.entries(experienceLevels).map(([level, description]) => (
+                          <Tooltip key={level} title={description} arrow>
+                            <ToggleButton value={level}>
+                              {level}
+                            </ToggleButton>
+                          </Tooltip>
+                        ))}
+                      </ToggleButtonGroup>
+                    </PreferenceSection>
+                  </Grid>
 
-      {history && history.length > 0 && (
-        <Box sx={{ mb: 6 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h4">Previous Recommendations</Typography>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={clearHistory}
-            >
-              Clear History
-            </Button>
-          </Box>
-          {history.map((item) => (
-            <Paper key={item.id} elevation={2} sx={{ p: 3, mb: 3 }}>
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="caption" display="block" gutterBottom>
-                  {item.timestamp}
-                </Typography>
-                <Typography><strong>Experience:</strong> {item.preferences.experienceLevel}</Typography>
-                <Typography><strong>Interests:</strong> {item.preferences.interests.join(", ")}</Typography>
-                <Typography><strong>Season:</strong> {item.preferences.season.join(", ")}</Typography>
-                {item.preferences.waterTemperature.length > 0 && (
-                  <Typography><strong>Water Temperature:</strong> {item.preferences.waterTemperature.join(", ")}</Typography>
-                )}
-                {item.preferences.visibility.length > 0 && (
-                  <Typography><strong>Visibility:</strong> {item.preferences.visibility.join(", ")}</Typography>
-                )}
-                {item.preferences.currentStrength.length > 0 && (
-                  <Typography><strong>Current:</strong> {item.preferences.currentStrength.join(", ")}</Typography>
-                )}
-                {item.preferences.maxDepth.length > 0 && (
-                  <Typography><strong>Max Depth:</strong> {item.preferences.maxDepth.join(", ")}</Typography>
-                )}
-                {item.preferences.regions.length > 0 && (
-                  <Typography><strong>Regions:</strong> {item.preferences.regions.join(", ")}</Typography>
-                )}
-              </Box>
-              <Divider sx={{ my: 3 }} />
-              <Typography variant="h5" gutterBottom>
-                {processLocations(item.recommendation).title}
-              </Typography>
-              <Grid container spacing={3}>
-                {processLocations(item.recommendation).locations.map((location, index) => (
-                  location.title && location.content && (
-                    <Grid item xs={12} md={6} key={index}>
-                      <RecommendationCard
-                        title={location.title}
-                        content={location.content}
-                        isFavorite={isFavorite(location.title)}
-                        onToggleFavorite={() => handleToggleFavorite(location.title, location.content)}
-                      />
+                  <Grid item xs={12}>
+                    <PreferenceSection title="Diving Interests">
+                      <ToggleButtonGroup
+                        value={preferences.interests}
+                        onChange={(_, value) => handlePreferenceChange("interests", value)}
+                        fullWidth
+                        size="small"
+                        sx={{ 
+                          flexWrap: 'wrap',
+                          '& .MuiToggleButton-root': {
+                            flex: '1 1 100%',
+                            py: 0.5
+                          }
+                        }}
+                      >
+                        {["Coral Reefs", "Wreck Diving", "Marine Life", "Cave Diving"].map((interest) => (
+                          <ToggleButton key={interest} value={interest}>
+                            {interest}
+                          </ToggleButton>
+                        ))}
+                      </ToggleButtonGroup>
+                    </PreferenceSection>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <PreferenceSection title="Travel Season">
+                      <ToggleButtonGroup
+                        value={preferences.season}
+                        onChange={(_, value) => handlePreferenceChange("season", value)}
+                        fullWidth
+                        size="small"
+                        sx={{ 
+                          flexWrap: 'wrap',
+                          '& .MuiToggleButton-root': {
+                            flex: '1 1 100%',
+                            py: 0.5
+                          }
+                        }}
+                      >
+                        {Object.entries(monthOptions).map(([months, description]) => (
+                          <Tooltip key={months} title={description} arrow>
+                            <ToggleButton value={months}>
+                              {months}
+                            </ToggleButton>
+                          </Tooltip>
+                        ))}
+                      </ToggleButtonGroup>
+                    </PreferenceSection>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <AdditionalPreferences
+                      preferences={preferences}
+                      onPreferenceChange={handlePreferenceChange}
+                    />
+                  </Grid>
+
+                  {error && (
+                    <Grid item xs={12}>
+                      <Alert severity="error">{error}</Alert>
                     </Grid>
-                  )
-                ))}
-              </Grid>
-              {processLocations(item.recommendation).summary && (
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="h6" gutterBottom>Summary</Typography>
-                  <Typography>{processLocations(item.recommendation).summary}</Typography>
+                  )}
+
+                  <Grid item xs={12}>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      fullWidth
+                      onClick={handleSubmit}
+                      disabled={isLoading}
+                      startIcon={isLoading && <CircularProgress size={24} color="inherit" />}
+                    >
+                      {isLoading ? "Finding Perfect Destinations..." : "Find My Perfect Destination"}
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Box>
+          </Grid>
+
+          {/* Middle Column - Recommendations */}
+          <Grid item xs={12} lg={6}>
+            {displayedResponse && displayedResponse.trim() !== "" && (
+              <Paper sx={{ p: 2, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>Recommendations</Typography>
+                <Typography variant="h5" gutterBottom align="center">
+                  {processLocations(displayedResponse).title}
+                </Typography>
+
+                {/* Only show summary when streaming is complete */}
+                {isStreamingComplete && processLocations(displayedResponse).summary && (
+                  <Box sx={{ mb: 4 }}>
+                    <Typography variant="h6" gutterBottom>Summary</Typography>
+                    <Typography>{processLocations(displayedResponse).summary}</Typography>
+                  </Box>
+                )}
+
+                {/* Show loading animation while streaming */}
+                {!isStreamingComplete && isLoading && (
+                  <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <CircularProgress size={24} />
+                    <Typography>Generating Summary...</Typography>
+                  </Box>
+                )}
+
+                <Grid container spacing={3}>
+                  {processLocations(displayedResponse).locations.map((location, index) => (
+                    location.title && location.content && (
+                      <Grid item xs={12} key={index}>
+                        <RecommendationCard
+                          title={location.title}
+                          content={location.content}
+                          isFavorite={isFavorite(location.title)}
+                          onToggleFavorite={() => handleToggleFavorite(location.title, location.content)}
+                        />
+                      </Grid>
+                    )
+                  ))}
+                </Grid>
+              </Paper>
+            )}
+
+            {history && history.length > 0 && (
+              <Paper sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6">Previous Recommendations</Typography>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={clearHistory}
+                    size="small"
+                  >
+                    Clear History
+                  </Button>
                 </Box>
-              )}
-            </Paper>
-          ))}
-        </Box>
-      )}
-    </Container>
+                {history.map((item) => (
+                  <Paper key={item.id} elevation={2} sx={{ p: 3, mb: 3 }}>
+                    <Box sx={{ mb: 3 }}>
+                      <Typography variant="caption" display="block" gutterBottom>
+                        {item.timestamp}
+                      </Typography>
+                      <Typography><strong>Experience:</strong> {item.preferences.experienceLevel}</Typography>
+                      <Typography><strong>Interests:</strong> {item.preferences.interests.join(", ")}</Typography>
+                      <Typography><strong>Season:</strong> {item.preferences.season.join(", ")}</Typography>
+                      {item.preferences.waterTemperature.length > 0 && (
+                        <Typography><strong>Water Temperature:</strong> {item.preferences.waterTemperature.join(", ")}</Typography>
+                      )}
+                      {item.preferences.visibility.length > 0 && (
+                        <Typography><strong>Visibility:</strong> {item.preferences.visibility.join(", ")}</Typography>
+                      )}
+                      {item.preferences.currentStrength.length > 0 && (
+                        <Typography><strong>Current:</strong> {item.preferences.currentStrength.join(", ")}</Typography>
+                      )}
+                      {item.preferences.maxDepth.length > 0 && (
+                        <Typography><strong>Max Depth:</strong> {item.preferences.maxDepth.join(", ")}</Typography>
+                      )}
+                      {item.preferences.regions.length > 0 && (
+                        <Typography><strong>Regions:</strong> {item.preferences.regions.join(", ")}</Typography>
+                      )}
+                    </Box>
+                    <Divider sx={{ my: 3 }} />
+                    <Typography variant="h5" gutterBottom>
+                      {processLocations(item.recommendation).title}
+                    </Typography>
+                    <Grid container spacing={3}>
+                      {processLocations(item.recommendation).locations.map((location, index) => (
+                        location.title && location.content && (
+                          <Grid item xs={12} key={index}>
+                            <RecommendationCard
+                              title={location.title}
+                              content={location.content}
+                              isFavorite={isFavorite(location.title)}
+                              onToggleFavorite={() => handleToggleFavorite(location.title, location.content)}
+                            />
+                          </Grid>
+                        )
+                      ))}
+                    </Grid>
+                    {processLocations(item.recommendation).summary && (
+                      <Box sx={{ mt: 3 }}>
+                        <Typography variant="h6" gutterBottom>Summary</Typography>
+                        <Typography>{processLocations(item.recommendation).summary}</Typography>
+                      </Box>
+                    )}
+                  </Paper>
+                ))}
+              </Paper>
+            )}
+          </Grid>
+
+          {/* Right Column - Favorites */}
+          <Grid item xs={12} lg={3}>
+            {favorites && favorites.length > 0 && (
+              <Box sx={{ position: 'sticky', top: 16 }}>
+                <Paper sx={{ p: 2 }}>
+                  <Typography variant="h6" gutterBottom>Favorite Destinations</Typography>
+                  <Grid container spacing={2}>
+                    {favorites.map((item) => (
+                      <Grid item xs={12} key={item.id}>
+                        <RecommendationCard
+                          title={item.title}
+                          content={item.content}
+                          isFavorite={true}
+                          onToggleFavorite={() => removeFromFavorites(item.id)}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Box>
+            )}
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
 }
 

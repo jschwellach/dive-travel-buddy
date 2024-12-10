@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -13,6 +12,7 @@ import ReactMarkdown, { Components } from 'react-markdown';
 import { useState } from 'react';
 import { InfoModal } from './InfoModal.mui';
 import { useOpenAI } from '../hooks/useOpenAI';
+import Box from '@mui/material/Box';
 
 interface RecommendationCardProps {
   title: string;
@@ -30,17 +30,45 @@ const MarkdownRenderer: Components = {
     </Typography>
   ),
   h1: ({ children }) => (
-    <Typography variant="h4" gutterBottom>
+    <Typography variant="h4" gutterBottom sx={{ mt: 2 }}>
       {children}
     </Typography>
   ),
   h2: ({ children }) => (
-    <Typography variant="h5" gutterBottom>
+    <Typography variant="h5" gutterBottom sx={{ mt: 2 }}>
       {children}
     </Typography>
   ),
   h3: ({ children }) => (
-    <Typography variant="h6" gutterBottom>
+    <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+      {children}
+    </Typography>
+  ),
+  ul: ({ children }) => (
+    <Box component="ul" sx={{ 
+      pl: 2,
+      '& li': {
+        mb: 1,
+      },
+      '& li:last-child': {
+        mb: 0,
+      }
+    }}>
+      {children}
+    </Box>
+  ),
+  li: ({ children }) => (
+    <Box component="li" sx={{ 
+      '& p': { 
+        display: 'inline',
+        m: 0 
+      }
+    }}>
+      {children}
+    </Box>
+  ),
+  strong: ({ children }) => (
+    <Typography component="span" sx={{ fontWeight: 'bold' }}>
       {children}
     </Typography>
   ),
@@ -90,9 +118,14 @@ export function RecommendationCard({
           />
         )}
         <CardContent sx={{ flexGrow: 1 }}>
-          <ReactMarkdown components={MarkdownRenderer}>
-            {content}
-          </ReactMarkdown>
+          <Box sx={{ 
+            '& > *:first-of-type': { mt: 0 },
+            '& > ul:first-of-type': { mt: 0 }
+          }}>
+            <ReactMarkdown components={MarkdownRenderer}>
+              {content}
+            </ReactMarkdown>
+          </Box>
         </CardContent>
         <CardActions>
           <Button
@@ -119,3 +152,5 @@ export function RecommendationCard({
     </>
   );
 }
+
+export default RecommendationCard;

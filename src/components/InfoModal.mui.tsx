@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -29,17 +28,45 @@ const MarkdownRenderer: Components = {
     </Typography>
   ),
   h1: ({ children }) => (
-    <Typography variant="h4" gutterBottom>
+    <Typography variant="h4" gutterBottom sx={{ mt: 2 }}>
       {children}
     </Typography>
   ),
   h2: ({ children }) => (
-    <Typography variant="h5" gutterBottom>
+    <Typography variant="h5" gutterBottom sx={{ mt: 2 }}>
       {children}
     </Typography>
   ),
   h3: ({ children }) => (
-    <Typography variant="h6" gutterBottom>
+    <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+      {children}
+    </Typography>
+  ),
+  ul: ({ children }) => (
+    <Box component="ul" sx={{ 
+      pl: 2,
+      '& li': {
+        mb: 1,
+      },
+      '& li:last-child': {
+        mb: 0,
+      }
+    }}>
+      {children}
+    </Box>
+  ),
+  li: ({ children }) => (
+    <Box component="li" sx={{ 
+      '& p': { 
+        display: 'inline',
+        m: 0 
+      }
+    }}>
+      {children}
+    </Box>
+  ),
+  strong: ({ children }) => (
+    <Typography component="span" sx={{ fontWeight: 'bold' }}>
       {children}
     </Typography>
   ),
@@ -64,7 +91,9 @@ export function InfoModal({
     >
       <DialogTitle>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <ReactMarkdown components={MarkdownRenderer}>{title}</ReactMarkdown>
+          <Box sx={{ pr: 6 }}>
+            <ReactMarkdown components={MarkdownRenderer}>{title}</ReactMarkdown>
+          </Box>
           <IconButton
             aria-label="close"
             onClick={onClose}
@@ -80,7 +109,10 @@ export function InfoModal({
         </Box>
       </DialogTitle>
       <DialogContent dividers>
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ 
+          '& > *:first-of-type': { mt: 0 },
+          '& > ul:first-of-type': { mt: 0 }
+        }}>
           <ReactMarkdown components={MarkdownRenderer}>{content}</ReactMarkdown>
         </Box>
         {(isLoading || additionalInfo || error) && (
@@ -93,7 +125,10 @@ export function InfoModal({
             ) : error ? (
               <Alert severity="error">{error}</Alert>
             ) : additionalInfo ? (
-              <Box>
+              <Box sx={{ 
+                '& > *:first-of-type': { mt: 0 },
+                '& > ul:first-of-type': { mt: 0 }
+              }}>
                 <Typography variant="h6" gutterBottom>Additional Information</Typography>
                 <ReactMarkdown components={MarkdownRenderer}>{additionalInfo}</ReactMarkdown>
               </Box>
@@ -107,3 +142,5 @@ export function InfoModal({
     </Dialog>
   );
 }
+
+export default InfoModal;

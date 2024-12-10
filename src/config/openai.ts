@@ -4,6 +4,7 @@
 
 // Check if API key is available
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const OPENAI_MODEL = import.meta.env.VITE_OPENAI_API_MODEL;
 
 // API configuration
 const API_CONFIG = {
@@ -70,7 +71,7 @@ export async function createStreamingCompletion(
       method: "POST",
       headers: API_CONFIG.headers,
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: OPENAI_MODEL,
         messages: [
           { role: "system", content: system },
           { role: "user", content: prompt },

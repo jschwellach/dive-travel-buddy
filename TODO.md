@@ -1,85 +1,49 @@
-# Dive Travel Buddy - Development Tasks
+# Dive Travel Buddy - Future Development Tasks
 
-## Current Status
+## Features
 
-- Basic React application setup with vanilla CSS
-- UI components for experience level, diving interests, and travel season
-- Basic responsive design implemented
-- Recommendation history with local storage persistence
+- Add images for recommended destinations
+- Add detailed information button for each recommendation/history card with OpenAI integration
+- Add weather information for recommended locations
 
-## Next Steps
+## Technical Improvements
 
-### 1. OpenAI Integration
+- Implement proper state management (Context or Redux)
+- Add unit tests for components
+- Add E2E tests for main user flows
+- Implement proper error boundaries
+- Add proper logging
 
-- [x] Add OpenAI API key configuration
-- [x] Implement streaming response handling
-- [x] Add error handling for API calls
-- [x] Add loading states during API calls
+## Documentation
 
-### 2. UI Enhancements
+- Add JSDoc comments for components
+- Add contributing guidelines
+- Document API integration details
 
-- [x] Add animations for button interactions
-- [x] Implement a loading animation for the recommendation generation
-- [x] Add a proper error message component
-- [x] Add tooltips for diving experience levels
-- [x] Improve mobile responsiveness
+## Performance
 
-### 3. Features
+- Implement code splitting
+- Add proper caching for API responses
+- Optimize bundle size
+- Add performance monitoring
 
-- [x] Add recommendation history
-- [x] Recommendation layout doesn't look good, it would be better to have a cards like layout per location if it's possible from the response
-- [x] Implement save/bookmark functionality for favorite destinations
-- [x] Instead of Beginner, Intermediate, Advance, we should also allow the user to specify the certification from PADI or SSI or TDI etc.
-- [x] Add more detailed diving preferences (water temperature, visibility, etc.)
-- [x] The Additional Preferences should be moved to a section below the other settings that spans the whole widths of that area and within the sections should be arranged smaller and with check boxes
-- [x] Travel Season is only considering northern hemisphere, better to use calendar months?
-- [x] Adding preferences for region (e.g. America, Europe, South-East Asia, Australia, etc.)
-- [ ] Add images for recommended destinations
-- [ ] Add a button for more information on each recommendation / history card that will call OpenAI API for additional information for Divers. The results should be shown (including all information from the card) in a modal dialog.
-- [ ] Add weather information for recommended locations
+## Accessibility
 
-### 4. Technical Improvements
+- Add proper ARIA labels
+- Implement keyboard navigation
+- Add screen reader support
+- Test with accessibility tools
 
-- [x] Add proper TypeScript support
-- [ ] Implement proper state management (Context or Redux)
-- [ ] Add unit tests for components
-- [ ] Add E2E tests for main user flows
-- [ ] Implement proper error boundaries
-- [ ] Add proper logging
+## Security
 
-### 5. Documentation
-
-- [ ] Add JSDoc comments for components
-- [ ] Create proper README with setup instructions
-- [ ] Add contributing guidelines
-- [ ] Document API integration details
-
-### 6. Performance
-
-- [ ] Implement code splitting
-- [ ] Add proper caching for API responses
-- [ ] Optimize bundle size
-- [ ] Add performance monitoring
-
-### 7. Accessibility
-
-- [ ] Add proper ARIA labels
-- [ ] Implement keyboard navigation
-- [ ] Add screen reader support
-- [ ] Test with accessibility tools
-
-### 8. Security
-
-- [ ] Implement proper API key handling
-- [ ] Add rate limiting
-- [ ] Add input sanitization
-- [ ] Implement proper CORS settings
+- Implement proper API key handling
+- Add rate limiting
+- Add input sanitization
+- Implement proper CORS settings
 
 ## Long-term Ideas
 
 - Integration with actual diving sites APIs
-- User accounts and preferences saving
-- Community features (reviews, ratings)
-- Dive log integration
-- Weather forecasts integration
-- Dive center booking integration
+- Weather data integration
+- Social features for divers
+- Mobile app version

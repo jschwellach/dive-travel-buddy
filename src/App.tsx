@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
+import { useInitialRecommendations } from "./hooks/useInitialRecommendations";
 import { useOpenAI } from "./hooks/useOpenAI";
 import { useRecommendationHistory } from "./hooks/useRecommendationHistory";
 import { useFavoriteDestinations } from "./hooks/useFavoriteDestinations";
 import "./App.css";
 import { RecommendationCard } from "./components/RecommendationCard";
-import { DebugPanel } from "./components/DebugPanel";
 import "./components/RecommendationCard.css";
 
 import { DivePreferences, ProcessedResponse } from './types/diving';
@@ -27,17 +27,31 @@ function App() {
     regions: []
   });
 
-  const { isLoading, error, streamedResponse, debugInfo, getRecommendations } =
+  const { isLoading: isOpenAILoading, error, streamedResponse, getRecommendations } =
     useOpenAI();
   const { history, addToHistory, clearHistory } = useRecommendationHistory();
   const { favorites, addToFavorites, removeFromFavorites, isFavorite } = useFavoriteDestinations();
+  const { isLoading: isCacheLoading, cachedRecommendations } = useInitialRecommendations(getRecommendations);
+
+  const isLoading = isOpenAILoading || isCacheLoading;
+  const displayedResponse = streamedResponse || cachedRecommendations;
 
   // Update history when streamedResponse changes
   useEffect(() => {
-    if (streamedResponse && streamedResponse.trim() !== "" && !isLoading) {
+    if (streamedResponse && streamedResponse.trim() !== "" && !isOpenAILoading) {
       addToHistory({ ...preferences }, streamedResponse);
     }
-  }, [streamedResponse, isLoading, preferences, addToHistory]);
+  }, [streamedResponse, isOpenAILoading, preferences, addToHistory]);
+
+  // Update cache when new recommendations are received
+  useEffect(() => {
+    if (streamedResponse && !isOpenAILoading) {
+      localStorage.setItem('initialRecommendations', JSON.stringify({
+        recommendations: streamedResponse,
+        timestamp: Date.now()
+      }));
+    }
+  }, [streamedResponse, isOpenAILoading]);
 
   const experienceLevels: ExperienceLevels = {
     "Beginner": "No diving certification. Want to do OpenWater course)",
@@ -68,7 +82,7 @@ function App() {
     if (
       !preferences.experienceLevel ||
       preferences.interests.length === 0 ||
-      !preferences.season
+      preferences.season.length === 0
     ) {
       alert("Please select all preferences");
       return;
@@ -208,13 +222,13 @@ function App() {
           : "Find My Perfect Destination"}
       </button>
 
-      {streamedResponse && streamedResponse.trim() !== "" && (
+      {displayedResponse && displayedResponse.trim() !== "" && (
         <div className="recommendations">
           <div className="recommendations-header">
-            <h2>{processLocations(streamedResponse).title}</h2>
+            <h2>{processLocations(displayedResponse).title}</h2>
           </div>
           <div className="recommendation-grid">
-            {processLocations(streamedResponse).locations.map((location, index) => (
+            {processLocations(displayedResponse).locations.map((location, index) => (
               location.title && location.content && (
                 <RecommendationCard
                   key={index}
@@ -226,10 +240,10 @@ function App() {
               )
             ))}
           </div>
-          {processLocations(streamedResponse).summary && (
+          {processLocations(displayedResponse).summary && (
             <div className="recommendations-summary">
               <h3>Summary</h3>
-              <p>{processLocations(streamedResponse).summary}</p>
+              <p>{processLocations(displayedResponse).summary}</p>
             </div>
           )}
         </div>
@@ -274,30 +288,36 @@ function App() {
                     {item.preferences.interests.join(", ")}
                   </p>
                   <p>
-                    <strong>Season:</strong> {item.preferences.season}
+                    <strong>Season:</strong> {item.preferences.season.join(", ")}
                   </p>
-                  {item.preferences.waterTemperature && (
+                  {item.preferences.waterTemperature.length > 0 && (
                     <p>
                       <strong>Water Temperature:</strong>{" "}
-                      {item.preferences.waterTemperature}
+                      {item.preferences.waterTemperature.join(", ")}
                     </p>
                   )}
-                  {item.preferences.visibility && (
+                  {item.preferences.visibility.length > 0 && (
                     <p>
                       <strong>Visibility:</strong>{" "}
-                      {item.preferences.visibility}
+                      {item.preferences.visibility.join(", ")}
                     </p>
                   )}
-                  {item.preferences.currentStrength && (
+                  {item.preferences.currentStrength.length > 0 && (
                     <p>
                       <strong>Current:</strong>{" "}
-                      {item.preferences.currentStrength}
+                      {item.preferences.currentStrength.join(", ")}
                     </p>
                   )}
-                  {item.preferences.maxDepth && (
+                  {item.preferences.maxDepth.length > 0 && (
                     <p>
                       <strong>Max Depth:</strong>{" "}
-                      {item.preferences.maxDepth}
+                      {item.preferences.maxDepth.join(", ")}
+                    </p>
+                  )}
+                  {item.preferences.regions.length > 0 && (
+                    <p>
+                      <strong>Regions:</strong>{" "}
+                      {item.preferences.regions.join(", ")}
                     </p>
                   )}
                 </div>
@@ -328,7 +348,6 @@ function App() {
           </div>
         </div>
       )}
-      <DebugPanel debugInfo={debugInfo} />
     </div>
   );
 }

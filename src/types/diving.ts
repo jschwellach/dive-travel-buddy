@@ -22,6 +22,7 @@ export const regionOptions = {
 export interface ProcessedLocation {
   title: string;
   content: string;
+  imageUrl?: string;
 }
 
 export interface ProcessedResponse {

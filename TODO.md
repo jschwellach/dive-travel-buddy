@@ -33,9 +33,9 @@
 - [x] Add more detailed diving preferences (water temperature, visibility, etc.)
 - [x] The Additional Preferences should be moved to a section below the other settings that spans the whole widths of that area and within the sections should be arranged smaller and with check boxes
 - [x] Travel Season is only considering northern hemisphere, better to use calendar months?
-- [ ] Adding preferences for region (e.g. America, Europe, South-East Asia, Australia, etc.)
+- [x] Adding preferences for region (e.g. America, Europe, South-East Asia, Australia, etc.)
 - [ ] Add images for recommended destinations
-- [ ] Add a button for more information on each recommendation / history card that will call OpenAI API for additional information for Divers
+- [ ] Add a button for more information on each recommendation / history card that will call OpenAI API for additional information for Divers. The results should be shown (including all information from the card) in a modal dialog.
 - [ ] Add weather information for recommended locations
 
 ### 4. Technical Improvements

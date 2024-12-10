@@ -8,6 +8,7 @@ import { DebugPanel } from "./components/DebugPanel";
 import "./components/RecommendationCard.css";
 
 import { DivePreferences, ProcessedResponse } from './types/diving';
+import { monthOptions } from './config/seasons';
 import { AdditionalPreferences } from "./components/AdditionalPreferences";
 
 interface ExperienceLevels {
@@ -18,11 +19,11 @@ function App() {
   const [preferences, setPreferences] = useState<DivePreferences>({
     experienceLevel: "",
     interests: [],
-    season: "",
-    waterTemperature: "",
-    visibility: "",
-    currentStrength: "",
-    maxDepth: ""
+    season: [],
+    waterTemperature: [],
+    visibility: [],
+    currentStrength: [],
+    maxDepth: []
   });
 
   const { isLoading, error, streamedResponse, debugInfo, getRecommendations } =
@@ -38,6 +39,7 @@ function App() {
   }, [streamedResponse, isLoading, preferences, addToHistory]);
 
   const experienceLevels: ExperienceLevels = {
+    "Beginner": "No diving certification. Want to do OpenWater course)",
     "Open Water": "Basic certification (PADI/SSI Open Water Diver or equivalent)",
     "Advanced": "Advanced certification (PADI/SSI Advanced Open Water or equivalent)",
     "Rescue": "Rescue Diver certification (PADI/SSI Rescue Diver or equivalent)",
@@ -45,13 +47,17 @@ function App() {
     "Technical": "Technical diving certification (TDI/PADI Tec certifications)"
   };
 
-  const handlePreferenceChange = (type: keyof DivePreferences, value: string): void => {
+  const handlePreferenceChange = (type: keyof DivePreferences, value: string | string[]): void => {
     setPreferences((prev) => {
-      if (type === "interests") {
-        const newInterests = prev.interests.includes(value)
-          ? prev.interests.filter((i) => i !== value)
-          : [...prev.interests, value];
-        return { ...prev, interests: newInterests };
+      if (Array.isArray(prev[type])) {
+        if (Array.isArray(value)) {
+          return { ...prev, [type]: value };
+        }
+        const currentArray = prev[type] as string[];
+        const newArray = currentArray.includes(value)
+          ? currentArray.filter((item) => item !== value)
+          : [...currentArray, value];
+        return { ...prev, [type]: newArray };
       }
       return { ...prev, [type]: value };
     });
@@ -110,7 +116,7 @@ function App() {
       .filter(location => location.title && location.content);
 
     // Extract summary from the last section
-    const summary = sections[sections.length - 1]?.replace(/^## Summary/, '').trim() || '';
+    const summary = sections[sections.length - 1]?.replace(/^(#*|\*).?Summary(\**)?:?/, '').trim() || '';
     
 
     return {
@@ -167,14 +173,15 @@ function App() {
 
         <div className="preference-card">
           <h3>Travel Season</h3>
-          <div className="button-group">
-            {["Spring", "Summer", "Fall", "Winter"].map((season) => (
+          <div className="button-group season-group">
+            {Object.entries(monthOptions).map(([months, description]) => (
               <button
-                key={season}
-                className={preferences.season === season ? "active" : ""}
-                onClick={() => handlePreferenceChange("season", season)}
+                key={months}
+                className={preferences.season.includes(months) ? "active" : ""}
+                onClick={() => handlePreferenceChange("season", months)}
+                data-tooltip={description}
               >
-                {season}
+                {months}
               </button>
             ))}
           </div>

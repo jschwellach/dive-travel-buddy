@@ -1,11 +1,11 @@
 export interface DivePreferences {
   experienceLevel: string;
   interests: string[];
-  season: string;
-  waterTemperature: string;
-  visibility: string;
-  currentStrength: string;
-  maxDepth: string;
+  season: string[];
+  waterTemperature: string[];
+  visibility: string[];
+  currentStrength: string[];
+  maxDepth: string[];
 }
 
 export interface ProcessedLocation {

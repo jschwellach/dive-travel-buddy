@@ -32,8 +32,10 @@
 - [x] Instead of Beginner, Intermediate, Advance, we should also allow the user to specify the certification from PADI or SSI or TDI etc.
 - [x] Add more detailed diving preferences (water temperature, visibility, etc.)
 - [x] The Additional Preferences should be moved to a section below the other settings that spans the whole widths of that area and within the sections should be arranged smaller and with check boxes
-- [ ] Travel Season is only considering northern hemisphere, better to use calendar months?
+- [x] Travel Season is only considering northern hemisphere, better to use calendar months?
+- [ ] Adding preferences for region (e.g. America, Europe, South-East Asia, Australia, etc.)
 - [ ] Add images for recommended destinations
+- [ ] Add a button for more information on each recommendation / history card that will call OpenAI API for additional information for Divers
 - [ ] Add weather information for recommended locations
 
 ### 4. Technical Improvements

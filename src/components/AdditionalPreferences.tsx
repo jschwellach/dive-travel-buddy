@@ -4,7 +4,7 @@ import { waterTemperatureOptions, visibilityOptions, currentStrengthOptions, max
 
 interface AdditionalPreferencesProps {
   preferences: DivePreferences;
-  onPreferenceChange: (type: keyof DivePreferences, value: string) => void;
+  onPreferenceChange: (type: keyof DivePreferences, value: string | string[]) => void;
 }
 
 export const AdditionalPreferences: React.FC<AdditionalPreferencesProps> = ({
@@ -27,68 +27,84 @@ export const AdditionalPreferences: React.FC<AdditionalPreferencesProps> = ({
         <div className="additional-preferences-content">
           <div className="preference-group">
             <h4>Water Temperature</h4>
-            <div className="checkbox-group">
+            <div className="button-group">
               {Object.entries(waterTemperatureOptions).map(([temp, description]) => (
-                <div key={temp} className="checkbox-item">
-                  <input
-                    type="checkbox"
-                    id={`temp-${temp}`}
-                    checked={preferences.waterTemperature === temp}
-                    onChange={() => onPreferenceChange("waterTemperature", preferences.waterTemperature === temp ? "" : temp)}
-                  />
-                  <label htmlFor={`temp-${temp}`} title={description}>{temp}</label>
-                </div>
+                <button
+                  key={temp}
+                  className={preferences.waterTemperature.includes(temp) ? "active" : ""}
+                  onClick={() => {
+                    const newValues = preferences.waterTemperature.includes(temp)
+                      ? preferences.waterTemperature.filter(t => t !== temp)
+                      : [...preferences.waterTemperature, temp];
+                    onPreferenceChange("waterTemperature", newValues);
+                  }}
+                  data-tooltip={description}
+                >
+                  {temp}
+                </button>
               ))}
             </div>
           </div>
 
           <div className="preference-group">
             <h4>Visibility</h4>
-            <div className="checkbox-group">
+            <div className="button-group">
               {Object.entries(visibilityOptions).map(([vis, description]) => (
-                <div key={vis} className="checkbox-item">
-                  <input
-                    type="checkbox"
-                    id={`vis-${vis}`}
-                    checked={preferences.visibility === vis}
-                    onChange={() => onPreferenceChange("visibility", preferences.visibility === vis ? "" : vis)}
-                  />
-                  <label htmlFor={`vis-${vis}`} title={description}>{vis}</label>
-                </div>
+                <button
+                  key={vis}
+                  className={preferences.visibility.includes(vis) ? "active" : ""}
+                  onClick={() => {
+                    const newValues = preferences.visibility.includes(vis)
+                      ? preferences.visibility.filter(v => v !== vis)
+                      : [...preferences.visibility, vis];
+                    onPreferenceChange("visibility", newValues);
+                  }}
+                  data-tooltip={description}
+                >
+                  {vis}
+                </button>
               ))}
             </div>
           </div>
 
           <div className="preference-group">
             <h4>Current Strength</h4>
-            <div className="checkbox-group">
+            <div className="button-group">
               {Object.entries(currentStrengthOptions).map(([current, description]) => (
-                <div key={current} className="checkbox-item">
-                  <input
-                    type="checkbox"
-                    id={`current-${current}`}
-                    checked={preferences.currentStrength === current}
-                    onChange={() => onPreferenceChange("currentStrength", preferences.currentStrength === current ? "" : current)}
-                  />
-                  <label htmlFor={`current-${current}`} title={description}>{current}</label>
-                </div>
+                <button
+                  key={current}
+                  className={preferences.currentStrength.includes(current) ? "active" : ""}
+                  onClick={() => {
+                    const newValues = preferences.currentStrength.includes(current)
+                      ? preferences.currentStrength.filter(c => c !== current)
+                      : [...preferences.currentStrength, current];
+                    onPreferenceChange("currentStrength", newValues);
+                  }}
+                  data-tooltip={description}
+                >
+                  {current}
+                </button>
               ))}
             </div>
           </div>
 
           <div className="preference-group">
             <h4>Maximum Depth</h4>
-            <div className="checkbox-group">
+            <div className="button-group">
               {Object.entries(maxDepthOptions).map(([depth, description]) => (
-                <div key={depth} className="checkbox-item">
-                  <input
-                    type="checkbox"
-                    id={`depth-${depth}`}
-                    checked={preferences.maxDepth === depth}
-                    onChange={() => onPreferenceChange("maxDepth", preferences.maxDepth === depth ? "" : depth)}
-                  />
-                  <label htmlFor={`depth-${depth}`} title={description}>{depth}</label>
-                </div>
+                <button
+                  key={depth}
+                  className={preferences.maxDepth.includes(depth) ? "active" : ""}
+                  onClick={() => {
+                    const newValues = preferences.maxDepth.includes(depth)
+                      ? preferences.maxDepth.filter(d => d !== depth)
+                      : [...preferences.maxDepth, depth];
+                    onPreferenceChange("maxDepth", newValues);
+                  }}
+                  data-tooltip={description}
+                >
+                  {depth}
+                </button>
               ))}
             </div>
           </div>

@@ -97,7 +97,11 @@ export function useOpenAI(): UseOpenAIReturn {
       - Best time to visit
       - Marine life to expect
       - Required certification level
+      - Depth range of the dives
+      - Water temperature
       - Any special considerations
+
+      If Beginner is selected, make sure you connect the user with some Dive Centers.
     `;
 
       try {

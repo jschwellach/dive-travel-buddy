@@ -166,7 +166,14 @@ function App() {
         <Grid container spacing={3}>
           {/* Left Column - Search Preferences */}
           <Grid item xs={12} lg={3}>
-            <Box sx={{ position: 'sticky', top: 16 }}>
+            <Box 
+              sx={{ 
+                position: 'sticky', 
+                top: 16, 
+                height: 'calc(100vh - 32px)',
+                overflowY: 'auto'
+              }}
+            >
               <Paper sx={{ p: 2 }}>
                 <Typography variant="h6" gutterBottom>Search Preferences</Typography>
                 <Grid container spacing={2}>
@@ -278,7 +285,7 @@ function App() {
           </Grid>
 
           {/* Middle Column - Recommendations */}
-          <Grid item xs={12} lg={6}>
+          <Grid item xs={12} lg={6} sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
             {displayedResponse && displayedResponse.trim() !== "" && (
               <Paper sx={{ p: 2, mb: 3 }}>
                 <Typography variant="h6" gutterBottom>Recommendations</Typography>
@@ -390,7 +397,14 @@ function App() {
           {/* Right Column - Favorites */}
           <Grid item xs={12} lg={3}>
             {favorites && favorites.length > 0 && (
-              <Box sx={{ position: 'sticky', top: 16 }}>
+              <Box 
+                sx={{ 
+                  position: 'sticky', 
+                  top: 16,
+                  height: 'calc(100vh - 32px)',
+                  overflowY: 'auto'
+                }}
+              >
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="h6" gutterBottom>Favorite Destinations</Typography>
                   <Grid container spacing={2}>

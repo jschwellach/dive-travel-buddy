@@ -4,12 +4,7 @@ import {
   OpenAIErrorTypes,
   OpenAIError,
 } from "../config/openai";
-
-interface DivePreferences {
-  experienceLevel: string;
-  interests: string[];
-  season: string;
-}
+import { DivePreferences } from "../types/diving";
 
 interface DebugInfo {
   timestamp: string;
@@ -91,6 +86,7 @@ export function useOpenAI(): UseOpenAIReturn {
       Experience Level: ${preferences.experienceLevel}
       Interests: ${preferences.interests.join(", ")}
       Travel Season: ${preferences.season}
+      Region: ${preferences.regions}
       
       Please provide detailed recommendations including:
       - Specific dive sites

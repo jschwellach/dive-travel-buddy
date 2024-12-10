@@ -23,7 +23,8 @@ function App() {
     waterTemperature: [],
     visibility: [],
     currentStrength: [],
-    maxDepth: []
+    maxDepth: [],
+    regions: []
   });
 
   const { isLoading, error, streamedResponse, debugInfo, getRecommendations } =

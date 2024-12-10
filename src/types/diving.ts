@@ -6,7 +6,18 @@ export interface DivePreferences {
   visibility: string[];
   currentStrength: string[];
   maxDepth: string[];
+  regions: string[];
 }
+
+export const regionOptions = {
+  "Americas": "North and South America",
+  "Europe": "Including Mediterranean",
+  "Asia-Pacific": "Including Australia and Pacific Islands",
+  "South-East Asia": "Thailand, Indonesia, Philippines etc.",
+  "Africa": "Including Red Sea",
+  "Caribbean": "Caribbean Islands",
+  "Indian Ocean": "Including Maldives and Seychelles"
+};
 
 export interface ProcessedLocation {
   title: string;

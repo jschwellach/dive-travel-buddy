@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DivePreferences } from '../types/diving';
-import { waterTemperatureOptions, visibilityOptions, currentStrengthOptions, maxDepthOptions } from '../types/diving';
+import { waterTemperatureOptions, visibilityOptions, currentStrengthOptions, maxDepthOptions, regionOptions } from '../types/diving';
 
 interface AdditionalPreferencesProps {
   preferences: DivePreferences;
@@ -104,6 +104,27 @@ export const AdditionalPreferences: React.FC<AdditionalPreferencesProps> = ({
                   data-tooltip={description}
                 >
                   {depth}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="preference-group">
+            <h4>Preferred Regions</h4>
+            <div className="button-group">
+              {Object.entries(regionOptions).map(([region, description]) => (
+                <button
+                  key={region}
+                  className={preferences.regions.includes(region) ? "active" : ""}
+                  onClick={() => {
+                    const newValues = preferences.regions.includes(region)
+                      ? preferences.regions.filter(r => r !== region)
+                      : [...preferences.regions, region];
+                    onPreferenceChange("regions", newValues);
+                  }}
+                  data-tooltip={description}
+                >
+                  {region}
                 </button>
               ))}
             </div>
